@@ -2,13 +2,14 @@
 
 from __future__ import division
 
-import os, sys
-import argparse, logging
-import pandas as pd
+import argparse
+# import pandas as pd
+import datenlader
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-vz', '--vzchn', type=str, dest='verzeichnis', default='./', help='verzeichnis zu laden')
 
     return parser.parse_args()
 
@@ -16,9 +17,8 @@ def parse_args():
 def main():
 
     args = parse_args()
-    logging.basicConfig()
 
-    laden_docs(args)
+    daten_pd = datenlader.laden_unterlagen(args.verzeichnis, ['Procurement Name', 'Implan536Index'])
     print('Done!')
 
 
