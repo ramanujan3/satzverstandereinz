@@ -4,8 +4,9 @@ from __future__ import division
 
 import pandas as pd
 
+
 """
-Worter
+Worter (Words)
 Verzeichnis = directory
 Laden = load
 Die Unterlagen = the docs
