@@ -8,9 +8,17 @@ import datenlader as dl
 import nlpbibliotek as nl
 
 
+"""
+Worter (Words)
+Satz = sentence
+Verzeichnis = directory
+"""
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-vz', '--vzchn', type=str, dest='verzeichnis', default='./', help='verzeichnis zu laden')
+    parser.add_argument('-vz', '--vzchn', type=str, dest='vzchn', default='./',
+                        help='verzeichnis zu laden')
 
     return parser.parse_args()
 
@@ -19,11 +27,20 @@ def main():
 
     args = parse_args()
 
-    daten_pd = dl.laden_unterlagen(args.verzeichnis, ['Procurement Name', 'Implan536Index'])
+    daten_pd = dl.laden_unterlagen(args.vzchn, ['Procurement Name', 'Implan536Index'])
 
-    print daten_pd['Procurement Name']
+    # print daten_pd['Procurement Name']
 
-    wortermodell = nl.bauenwortermodell(daten_pd['Procurement Name'])
+    nl.zeichenen(daten_pd, 'Procurement Name', 'Procurement Zeichen')
+    wortermodell = nl.bauenwortermodell(daten_pd['Procurement Zeichen'])
+
+    worter = list(wortermodell.wv.vocab)
+    worter.sort()
+    print worter
+
+    nl.anhangen_wortcodes(daten_pd, wortermodell, 'Procurement Zeichen', 'Procurement Code')
+
+    # print daten_pd['Procurement Code']
 
     print('Done!')
 

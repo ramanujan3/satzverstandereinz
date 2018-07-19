@@ -7,8 +7,9 @@ import pandas as pd
 
 """
 Worter (Words)
-Verzeichnis = directory
+Daten = Data
 Laden = load
+Verzeichnis = directory
 Die Unterlagen = the docs
 Die Konfiguration = the config
 Die Spalten = columns
