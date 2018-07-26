@@ -37,6 +37,7 @@ def main():
     worter = list(wortermodell.wv.vocab)
     worter.sort()
     print worter
+    print len(worter)
 
     nl.anhangen_wortcodes(daten_pd, wortermodell, 'Procurement Zeichen', 'Procurement Code')
 
