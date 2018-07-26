@@ -41,7 +41,8 @@ def main():
 
     nl.anhangen_wortcodes(daten_pd, wortermodell, 'Procurement Zeichen', 'Procurement Code')
 
-    # print daten_pd['Procurement Code']
+    print daten_pd['Procurement Code']
+    # print(wortermodell['aramark'])
 
     print('Done!')
 
