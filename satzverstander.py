@@ -11,7 +11,11 @@ import nlpbibliotek as nl
 """
 Worter (Words)
 Satz = sentence
-Verzeichnis = directory
+Verzeichnis (vzchn) = directory
+Verstander = Understander
+
+Laden = load
+Die Unterlagen = the docs
 """
 
 
@@ -32,16 +36,16 @@ def main():
     # print daten_pd['Procurement Name']
 
     nl.zeichenen(daten_pd, 'Procurement Name', 'Procurement Zeichen')
-    wortermodell = nl.bauenwortermodell(daten_pd['Procurement Zeichen'])
+    wortermodell = nl.bauen_wortermodell(daten_pd['Procurement Zeichen'])
 
     worter = list(wortermodell.wv.vocab)
     worter.sort()
     print worter
     print len(worter)
 
-    nl.anhangen_wortcodes(daten_pd, wortermodell, 'Procurement Zeichen', 'Procurement Code')
+    nl.anhangen_wortcodes(daten_pd, wortermodell, 'Procurement Zeichen', 'Procurement Coden')
 
-    print daten_pd['Procurement Code']
+    print daten_pd['Procurement Coden']
     # print(wortermodell['aramark'])
 
     print('Done!')
