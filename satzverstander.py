@@ -16,6 +16,7 @@ Verstander = Understander
 
 Laden = load
 Die Unterlagen = the docs
+Zeichen = Tokens
 """
 
 
