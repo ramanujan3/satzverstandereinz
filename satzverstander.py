@@ -11,12 +11,12 @@ import nlpbibliotek as nl
 """
 Worter (Words)
 Satz = sentence
+Zeichen = Tokens
 Verzeichnis (vzchn) = directory
 Verstander = Understander
 
 Laden = load
 Die Unterlagen = the docs
-Zeichen = Tokens
 """
 
 
@@ -41,12 +41,12 @@ def main():
 
     worter = list(wortermodell.wv.vocab)
     worter.sort()
-    print worter
-    print len(worter)
+    print(worter)
+    print(len(worter))
 
     nl.anhangen_wortcodes(daten_pd, wortermodell, 'Procurement Zeichen', 'Procurement Coden')
 
-    print daten_pd['Procurement Coden']
+    print(daten_pd['Procurement Coden'])
     # print(wortermodell['aramark'])
 
     print('Done!')
