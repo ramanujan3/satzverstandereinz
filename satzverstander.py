@@ -22,7 +22,7 @@ Die Unterlagen = the docs
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-vz', '--vzchn', type=str, dest='vzchn', default='./',
+    parser.add_argument('-vz', '--vzchn', type=str, dest='vzchn', default='../matching_model/data/cl3.csv',
                         help='verzeichnis zu laden')
 
     return parser.parse_args()
