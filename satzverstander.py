@@ -5,7 +5,9 @@ from __future__ import division
 import argparse
 # import pandas as pd
 import datenlader as dl
-import nlpbibliotek as nl
+
+###########
+#import nlpbibliotek as nl
 
 
 """
@@ -48,8 +50,10 @@ def main():
         # print daten_pd['Procurement Name']
         nl.zeichenen(daten_pd, args.proname[i], 'Procurement Zeichen')
 
+    # nl.zeichenen(daten_pd, 'Procurement Name', 'Procurement Zeichen')
     wortermodell = nl.bauen_wortermodell(daten_pd['Procurement Zeichen'])
 
+ 
     worter = list(wortermodell.wv.vocab)
     worter.sort()
     # print(worter)
