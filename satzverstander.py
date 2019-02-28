@@ -10,7 +10,7 @@ import datenlader as dl
 
 # Check in test
 
-#import nlpbibliotek as nl
+import nlpbibliotek as nl
 
 
 """
@@ -28,16 +28,17 @@ Die Unterlagen = the docs
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-vz', '--vzchn', nargs='+', type=str, dest='vzchn',
-                        default=['../matching_model/data/cl1.csv',
-                                 '../matching_model/data/cl2.csv',
-                                 '../matching_model/data/cl3.csv'],
+                        default=['~/matching_model/data/cl1.csv',
+                                 '~/matching_model/data/cl2.csv',
+                                 '~/matching_model/data/cl3.csv'],
                         help='verzeichnis zu laden')
 
-    ############################
-    # TBD:
-    #  NOT SURE ABOUT "ITEM TEXT" and "OBJECT"
-    parser.add_argument('-pn', '--proname', nargs='+', type=str, dest='proname',
-                        default=['Item Text', 'Object', 'Procurement Name'],
+    parser.add_argument('-pt', '--protext', nargs='+', type=str, dest='protext',
+                        default=['Item Text', 'AP 3rd Level', 'Procurement Name'],
+                        help='procurement namen zu laden')
+
+    parser.add_argument('-pc', '--proclass', nargs='+', type=str, dest='proclass',
+                        default=['Implan536Index', 'Implan536Index', 'Implan536Index'],
                         help='procurement namen zu laden')
 
     return parser.parse_args()
@@ -48,10 +49,10 @@ def main():
     args = parse_args()
 
     for i, vzchn in enumerate(args.vzchn):
-        daten_pd = dl.laden_unterlagen(vzchn, [args.proname[i], 'Implan536Index'])
+        daten_pd = dl.laden_unterlagen(vzchn, [args.protext[i], 'Implan536Index'])
 
         # print daten_pd['Procurement Name']
-        nl.zeichenen(daten_pd, args.proname[i], 'Procurement Zeichen')
+        nl.zeichenen(daten_pd, args.protext[i], 'Procurement Zeichen')
 
     # nl.zeichenen(daten_pd, 'Procurement Name', 'Procurement Zeichen')
     wortermodell = nl.bauen_wortermodell(daten_pd['Procurement Zeichen'])
