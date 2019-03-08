@@ -3,19 +3,19 @@
 from __future__ import division
 
 import argparse
-# import pandas as pd
+import pandas as pd
+
 import datenlader as dl
-
-###########
-
-# Check in test
-
 import nlpbibliotek as nl
+import vorhersager as vs
+
+from sklearn.model_selection import train_test_split
 
 
 """
+VOKABULAR
 Worter (Words)
-Satz = sentence
+Satz = setence
 Zeichen = Tokens
 Verzeichnis (vzchn) = directory
 Verstander = Understander
@@ -49,19 +49,22 @@ def parse_args():
                         help='procurement namen zu laden')
 
     parser.add_argument('-vg', '--vekgrosse', type=int, dest='vek_grosse',
-                        default=30,
+                        default=4,
                         help='Grosse des Vektors')
 
     parser.add_argument('-vf', '--vekfenster', type=int, dest='vek_fenster',
-                        default=3,
+                        default=4,
                         help='Fenster des Vektors')
 
     return parser.parse_args()
 
-
 def main():
 
     args = parse_args()
+
+    SATZ_MAXLEN = 4
+    CLS_MIN = 60
+    CLS_MAX = 510
 
     for i, vzchn in enumerate(args.vzchn):
 
@@ -73,39 +76,76 @@ def main():
 
         # print daten_pd['Procurement Name']
 
-        daten_pd['Procurement String'] = daten_pd[args.protexts[i]].apply(lambda x: ' '.join(x), axis=1)
-        nl.zeichenen(daten_pd, 'Procurement String', 'Procurement Zeichen')
+        daten_pd['procure_str'] = daten_pd[args.protexts[i]].apply(lambda x: ' '.join(x), axis=1)
+        daten_pd['procure_cls'] =  daten_pd[args.proclass[i]]
+
+        daten_pd['File ID'] = i
+        nl.zeichenen(daten_pd, 'procure_str', 'procure_zeichen')
+        daten_pd['zeichen_len'] = daten_pd['procure_zeichen'].str.len()
+
 
     # nl.zeichenen(daten_pd, 'Procurement Name', 'Procurement Zeichen')
-    wortermodell = nl.bauen_wortermodell(daten_pd['Procurement Zeichen'], args.vek_grosse, args.vek_fenster)
+    wortermodell = nl.bauen_wortermodell(daten_pd['procure_zeichen'], args.vek_grosse, args.vek_fenster)
 
  
     worter = list(wortermodell.wv.vocab)
-    worter.sort()
-    print(worter)
-    print('Number of Words:',
-          len(worter))
+    # worter.sort()
+    # print(worter)
 
-    nl.anhangen_wortcodes(daten_pd, wortermodell, 'Procurement Zeichen', 'Procurement Coden')
+    # No Matches can't be used for training and testing
+    lbld_daten_pd = daten_pd[daten_pd.procure_cls != "No Match"]
 
-    print(daten_pd.iloc[234])
+    print('\nNum words:',
+		len(worter))
 
-    print('Number of Procurement lines:',
-          len(daten_pd['Procurement Coden']))
+    nl.anhangen_wortcodes(lbld_daten_pd, wortermodell, args.vek_grosse, SATZ_MAXLEN,
+                          'procure_zeichen', 'procure_coden', 'procure_x')
+
+    print('\n', daten_pd.iloc[234])
+    print('\n', daten_pd.iloc[2])
+
+    print("\n Min/avg/max string lengths:", lbld_daten_pd['zeichen_len'].min(),
+                                         lbld_daten_pd['zeichen_len'].mean(),
+                                         lbld_daten_pd['zeichen_len'].max())
+    lbld_daten_pd['procure_clsy'] = pd.to_numeric(lbld_daten_pd['procure_cls'])
+    print(" Min/avg/max procurement class:", lbld_daten_pd['procure_clsy'].min(),
+                                         lbld_daten_pd['procure_clsy'].mean(),
+                                         lbld_daten_pd['procure_clsy'].max())
+    print('\n Num procure lines:',
+          len(daten_pd))
+    print(' Num labeled procure lines:',
+          len(lbld_daten_pd))
+
+
+
+    # print(daten_pd.iloc[234]['procure_coden'])
+    # print(daten_pd.iloc[234]['procure_x'])
+
+    x = lbld_daten_pd['procure_x']
+    y = []
+    for clsyz in lbld_daten_pd['procure_clsy']:
+        y_i = [0] * (CLS_MAX - CLS_MIN)
+        y_i[clsyz - CLS_MIN] = 1
+        y.append(y_i)
+
+    print('\n\n x:', x[234])
+    print('y', y[234])
     
     # print(wortermodell['aramark'])
 
-    print("aramark")
+    print('\n', "aramark")
     print(wortermodell.similar_by_vector('aramark', 5))
     print("wholesale")
     print(wortermodell.similar_by_vector('wholesale', 5))
     print("recruitment")
     print(wortermodell.similar_by_vector('recruitment', 5))
-    print("zurich")
-    print(wortermodell.similar_by_vector('zurich', 5))
+    # print("zurich")
+    # print(wortermodell.similar_by_vector('zurich', 5))
 
-    print('Done!')
+    print('\n\n --- ERLEDIGT --- ')
 
+    x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=False, random_state=13)
+    vs.run_lstm(x_trn, x_tst, y_trn, y_tst)
 
 if __name__ == "__main__":
     main()

@@ -1,13 +1,11 @@
-
-
 #!/usr/bin/env python
-
 from __future__ import division
 
 import pandas as pd
 
 
 """
+VOKABULAR
 Worter (Words)
 Daten = Data
 Laden = load
