@@ -4,6 +4,7 @@ from __future__ import division
 
 import argparse
 import pandas as pd
+import numpy as np
 
 import datenlader as dl
 import nlpbibliotek as nl
@@ -49,11 +50,11 @@ def parse_args():
                         help='procurement namen zu laden')
 
     parser.add_argument('-vg', '--vekgrosse', type=int, dest='vek_grosse',
-                        default=4,
+                        default=24,
                         help='Grosse des Vektors')
 
     parser.add_argument('-vf', '--vekfenster', type=int, dest='vek_fenster',
-                        default=4,
+                        default=3,
                         help='Fenster des Vektors')
 
     return parser.parse_args()
@@ -62,7 +63,7 @@ def main():
 
     args = parse_args()
 
-    SATZ_MAXLEN = 4
+    SATZ_MAXLEN = 8
     CLS_MIN = 60
     CLS_MAX = 510
 
@@ -102,7 +103,7 @@ def main():
                           'procure_zeichen', 'procure_coden', 'procure_x')
 
     print('\n', daten_pd.iloc[234])
-    print('\n', daten_pd.iloc[2])
+    # print('\n', daten_pd.iloc[2])
 
     print("\n Min/avg/max string lengths:", lbld_daten_pd['zeichen_len'].min(),
                                          lbld_daten_pd['zeichen_len'].mean(),
@@ -116,8 +117,6 @@ def main():
     print(' Num labeled procure lines:',
           len(lbld_daten_pd))
 
-
-
     # print(daten_pd.iloc[234]['procure_coden'])
     # print(daten_pd.iloc[234]['procure_x'])
 
@@ -128,10 +127,16 @@ def main():
         y_i[clsyz - CLS_MIN] = 1
         y.append(y_i)
 
-    print('\n\n x:', x[234])
-    print('y', y[234])
+    x = np.array([np.array(xi) for xi in x])
+    y = np.array([np.array(yi) for yi in y])
+
+    x = np.expand_dims(x, axis=2)
+    # x = x.reshape(23462, 77, 1)
     
-    # print(wortermodell['aramark'])
+    # x = np.array(x)
+
+    # print('\n\n x:', x[234])
+    # print('y: ', y[234])
 
     print('\n', "aramark")
     print(wortermodell.similar_by_vector('aramark', 5))
@@ -142,10 +147,19 @@ def main():
     # print("zurich")
     # print(wortermodell.similar_by_vector('zurich', 5))
 
-    print('\n\n --- ERLEDIGT --- ')
+    m_hidden = 256
+    epochs = 8
+    lamba_lrate = 0.001
+    batch_size = 64
 
     x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=False, random_state=13)
-    vs.run_lstm(x_trn, x_tst, y_trn, y_tst)
+    vs.run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size)
+
+    
+
+    print('\n W2V Params: WordVec Len ', args.vek_grosse, ' | SentenceMax Len ', SATZ_MAXLEN, ' | ')
+    print('\n LSTM Params: Hiddens ', m_hidden, epochs, lamba_lrate, batch_size)
+    print('\n\n --- ERLEDIGT --- ')
 
 if __name__ == "__main__":
     main()
