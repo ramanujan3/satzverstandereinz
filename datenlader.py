@@ -29,7 +29,6 @@ def laden_unterlagen(verzeichnis, spalten_benutzt):
     """
     Eine Funktion zum laden Unterlagen
     """
-
-    print(verzeichnis)
+    # print(verzeichnis)
     daten_pd = pd.read_csv(verzeichnis, usecols=spalten_benutzt, dtype=str)
     return daten_pd

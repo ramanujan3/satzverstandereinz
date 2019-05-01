@@ -41,7 +41,7 @@ def elapsed(sec):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-vz', '--vzchn', nargs='+', type=str, dest='vzchn',
-                        default=['~/matching_model/data/cl3.csv'],
+                        default=['~/matching_model/data/cl3MM.csv'],
                                  # '~/matching_model/data/cl1.csv'],
                                  # '~/matching_model/data/cl2.csv'],
                                  # '~/matching_model/data/cl3.csv'],
@@ -79,13 +79,13 @@ def main():
     CLS_MIN = 1
     CLS_MAX = 536
 
-    start_time = time.time()
+    start_time_1 = time.time()
     for i, vzchn in enumerate(args.vzchn):
 
         cols_zu_laden = args.protexts[i] + [args.proclass[i]]
-        print(args.protexts[i])
-        print(args.proclass[i])
-        print(cols_zu_laden)
+        # print(args.protexts[i])
+        # print(args.proclass[i])
+        # print(cols_zu_laden)
         daten_pd = dl.laden_unterlagen(vzchn, cols_zu_laden)
 
         # print daten_pd['Procurement Name']
@@ -98,7 +98,7 @@ def main():
         daten_pd['zeichen_len'] = daten_pd['procure_zeichen'].str.len()
 
     # nl.zeichenen(daten_pd, 'Procurement Name', 'Procurement Zeichen')
-    print('  <<< data load time: ', elapsed(time.time() - start_time), '\n')
+    print('  --- data load time: ', elapsed(time.time() - start_time_1))
 
 
     # -------------------------------------------
@@ -106,13 +106,11 @@ def main():
     start_time = time.time()
     wortermodell = nl.bauen_wortermodell(daten_pd['procure_zeichen'], args.vek_grosse, args.vek_fenster)
     worter = list(wortermodell.wv.vocab)
-    print('\nNum words:',
-        len(worter))
+    print('          analyzed ', len(worter), ' words')
 
-    print('  <<< make word models time: ', elapsed(time.time() - start_time), '\n')
+    print('  --- build words model time: ', elapsed(time.time() - start_time), '\n')
     # worter.sort()
     # print(worter)
-
 
     # -------------------------------------------
 
@@ -123,7 +121,7 @@ def main():
     nl.anhangen_wortcodes(lbld_daten_pd, wortermodell, args.vek_grosse, SATZ_MAXLEN,
                           'procure_zeichen', 'procure_coden', 'procure_x')
 
-    print('\n', daten_pd.iloc[234])
+    # print('\n', daten_pd.iloc[234])
     # print('\n', daten_pd.iloc[2])
 
     print("\n Min/avg/max string lengths:", lbld_daten_pd['zeichen_len'].min(),
@@ -133,7 +131,7 @@ def main():
     print(" Min/avg/max procurement class:", lbld_daten_pd['procure_clsy'].min(),
                                          lbld_daten_pd['procure_clsy'].mean(),
                                          lbld_daten_pd['procure_clsy'].max())
-    print('\n Num procure lines:',
+    print(' Num procure lines:',
           len(daten_pd))
     print(' Num labeled procure lines:',
           len(lbld_daten_pd))
@@ -161,14 +159,14 @@ def main():
 
     # print('\n', "aramark")
     # print(wortermodell.similar_by_vector('aramark', 5))
-    print("wholesale")
-    print(wortermodell.similar_by_vector('wholesale', 5))
+    # print("wholesale")
+    # print(wortermodell.similar_by_vector('wholesale', 5))
     # print("recruitment")
     # print(wortermodell.similar_by_vector('recruitment', 5))
     # print("zurich")
     # print(wortermodell.similar_by_vector('zurich', 5))
 
-    print('  <<< prep data and stats time: ', elapsed(time.time() - start_time), '\n')
+    print('\n', '  --- prep data and stats time: ', elapsed(time.time() - start_time), '\n')
 
 
     # -------------------------------------------
@@ -184,15 +182,14 @@ def main():
     vs.run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size)
 
 
-    print('\n W2V: WVec Len \t| SentenceMax Len ')
-    print('\n               ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
+    print('W2V: WVec Len \t| SentenceMax Len ')
+    print('               ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
     print('\n LSTM: Hidden Size \t| Epochs   \t| Learn R   \t| batch_size')
-    print('\n                    ', m_hidden, '\t ', epochs, '\t ', lamba_lrate, '\t ', batch_size)
+    print('                    ', m_hidden, '\t ', epochs, '\t ', lamba_lrate, '\t ', batch_size)
 
-    print("  <<< machine learning time: ", elapsed(time.time() - start_time), '\n')
-
-
-    print('\n\n --- ERLEDIGT --- ')
+    print("   --- machine learning time: ", elapsed(time.time() - start_time))
+    print(' --- total time: ', elapsed(time.time() - start_time_1))
+    print('\n--ERLEDIGT--')
 
 if __name__ == "__main__":
     main()

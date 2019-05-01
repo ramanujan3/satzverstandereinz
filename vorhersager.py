@@ -36,20 +36,21 @@ def RNN(x, y, weights, biases, n_input, m_hidden, k_output):
     # x = tf.split(x, n_input)
 
     # 2-layer LSTM, each layer has m_hidden units.
-    rnn_cell = ([tf.keras.layers.LSTMCell(m_hidden),tf.keras.layers.LSTMCell(m_hidden)])
+    # rnn_cell = ([tf.keras.layers.LSTMCell(m_hidden),tf.keras.layers.LSTMCell(m_hidden)])
 
     # 1-layer LSTM with n_hidden units but with lower accuracy.
-    # rnn_cell = rnn.BasicLSTMCell(m_hidden)
+    rnn_cell = rnn.BasicLSTMCell(m_hidden)
 
     # generate prediction
-    # outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
-    outputs = tf.keras.layers.RNN(rnn_cell, x, dtype=tf.float32)
+    outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
+    # outputs = tf.keras.layers.RNN(rnn_cell, x, dtype=tf.float32)
 
     # there are n_input outputs but
     # we only want the last output
     # return tf.matmul(outputs[-1], weights['out']) + biases['out']
     # Appear to need the softmax
     return tf.nn.softmax(tf.matmul(outputs[-1], weights['out']) + biases['out'])
+    # return tf.nn.softmax(tf.matmul(outputs, weights['out']) + biases['out'])
 
 
 def build(lamba_lrate, n_input, m_hidden, k_output):
@@ -116,7 +117,7 @@ def train(sess, x_trn, y_trn, x, y, vorhersagt,
 
             i += batch_size
 
-        print('Epoch', epoch, 'completed out of', epochs, 'loss:', epoch_loss)
+        print('       --- epoch', epoch, '/', epochs, ', loss:', epoch_loss)
 
     pred = tf.round(tf.nn.sigmoid(vorhersagt)).eval({x: np.array(x_trn), y: np.array(y_trn)})
 
@@ -141,7 +142,6 @@ def train(sess, x_trn, y_trn, x, y, vorhersagt,
     #               "{:.2f}%".format(100*acc_total/disp_freq))
     #         acc_total = 0
     #         loss_total = 0
-
 
     # print("Optimization Finished!")
     # print("Elapsed time: ", elapsed(time.time() - start_time))
@@ -189,7 +189,7 @@ def run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_si
 
     # x, y, weights, biases = 
     x, y, vorhersagt, cost, optimizer, accuracy = build(lamba_lrate, n_input, m_hidden, k_output)
-
+    print('     --- lstm build time: ', elapsed(time.time() - start_time), '\n')
 
     # Initializing the variables
     #init = tf.global_variables_initializer()
@@ -206,5 +206,7 @@ def run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_si
             cost, optimizer, accuracy, epochs, batch_size, disp_freq, 
             n_input, m_hidden, k_output, start_time) # x, y, weights, biases, n_input, k_output, x_trn, y_trn)
         test(sess, x_tst, y_tst, x, y, vorhersagt)
+
+    print('     --- total lstm time: ', elapsed(time.time() - start_time), '\n')
 
     return
