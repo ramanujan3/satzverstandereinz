@@ -21,7 +21,7 @@ def laden_konfiguration(verzeichnis, spalten_benutzt):
     """
     Eine Funktion zum laden der Konfiguration
     """
-    konfigs_pd = pd.read_csv(verzeichnis, usecols=spalten_benutzt)
+    konfigs_pd = pd.read_csv(verzeichnis, usecols=spalten_benutzt, dtype=str)
     return konfigs_pd
 
 
@@ -31,5 +31,5 @@ def laden_unterlagen(verzeichnis, spalten_benutzt):
     """
 
     print(verzeichnis)
-    daten_pd = pd.read_csv(verzeichnis, usecols=spalten_benutzt)
+    daten_pd = pd.read_csv(verzeichnis, usecols=spalten_benutzt, dtype=str)
     return daten_pd

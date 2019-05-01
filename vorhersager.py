@@ -36,13 +36,14 @@ def RNN(x, y, weights, biases, n_input, m_hidden, k_output):
     # x = tf.split(x, n_input)
 
     # 2-layer LSTM, each layer has m_hidden units.
-    rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(m_hidden),rnn.BasicLSTMCell(m_hidden)])
+    rnn_cell = ([tf.keras.layers.LSTMCell(m_hidden),tf.keras.layers.LSTMCell(m_hidden)])
 
     # 1-layer LSTM with n_hidden units but with lower accuracy.
     # rnn_cell = rnn.BasicLSTMCell(m_hidden)
 
     # generate prediction
-    outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
+    # outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
+    outputs = tf.keras.layers.RNN(rnn_cell, x, dtype=tf.float32)
 
     # there are n_input outputs but
     # we only want the last output

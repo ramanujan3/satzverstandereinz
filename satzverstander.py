@@ -3,6 +3,7 @@
 from __future__ import division
 
 import argparse
+import time
 import pandas as pd
 import numpy as np
 
@@ -26,19 +27,30 @@ Die Unterlagen = the docs
 """
 
 
+
+def elapsed(sec):
+    if sec<60:
+        return str(sec) + " sec"
+    elif sec<(60*60):
+        return str(sec/60) + " min"
+    else:
+        return str(sec/(60*60)) + " hr"
+
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-vz', '--vzchn', nargs='+', type=str, dest='vzchn',
                         default=['~/matching_model/data/cl3.csv'],
-                                 # '~/matching_model/data/cl1.csv',
-                                 # '~/matching_model/data/cl2.csv',
+                                 # '~/matching_model/data/cl1.csv'],
+                                 # '~/matching_model/data/cl2.csv'],
                                  # '~/matching_model/data/cl3.csv'],
                         help='verzeichnis zu laden')
 
     parser.add_argument('-pt', '--protexts', nargs='+', type=str, dest='protexts',
                         default=[['Procurement Name', 'GL Name']],
-                        		 # 'Item Text', 
-                        		 # 'AP 3rd Level',
+                        		 # ['Vendor', 'Item Text']], 
+                        		 # ['Supplier Name', 'AP 3rd Level']],
                         		 # 'Procurement Name'],
                         help='procurement namen zu laden')
 
@@ -50,11 +62,11 @@ def parse_args():
                         help='procurement namen zu laden')
 
     parser.add_argument('-vg', '--vekgrosse', type=int, dest='vek_grosse',
-                        default=24,
+                        default=32,
                         help='Grosse des Vektors')
 
     parser.add_argument('-vf', '--vekfenster', type=int, dest='vek_fenster',
-                        default=3,
+                        default=4,
                         help='Fenster des Vektors')
 
     return parser.parse_args()
@@ -64,9 +76,10 @@ def main():
     args = parse_args()
 
     SATZ_MAXLEN = 8
-    CLS_MIN = 60
-    CLS_MAX = 510
+    CLS_MIN = 1
+    CLS_MAX = 536
 
+    start_time = time.time()
     for i, vzchn in enumerate(args.vzchn):
 
         cols_zu_laden = args.protexts[i] + [args.proclass[i]]
@@ -84,20 +97,28 @@ def main():
         nl.zeichenen(daten_pd, 'procure_str', 'procure_zeichen')
         daten_pd['zeichen_len'] = daten_pd['procure_zeichen'].str.len()
 
-
     # nl.zeichenen(daten_pd, 'Procurement Name', 'Procurement Zeichen')
-    wortermodell = nl.bauen_wortermodell(daten_pd['procure_zeichen'], args.vek_grosse, args.vek_fenster)
+    print('  <<< data load time: ', elapsed(time.time() - start_time), '\n')
 
- 
+
+    # -------------------------------------------
+
+    start_time = time.time()
+    wortermodell = nl.bauen_wortermodell(daten_pd['procure_zeichen'], args.vek_grosse, args.vek_fenster)
     worter = list(wortermodell.wv.vocab)
+    print('\nNum words:',
+        len(worter))
+
+    print('  <<< make word models time: ', elapsed(time.time() - start_time), '\n')
     # worter.sort()
     # print(worter)
 
+
+    # -------------------------------------------
+
+    start_time = time.time()
     # No Matches can't be used for training and testing
     lbld_daten_pd = daten_pd[daten_pd.procure_cls != "No Match"]
-
-    print('\nNum words:',
-		len(worter))
 
     nl.anhangen_wortcodes(lbld_daten_pd, wortermodell, args.vek_grosse, SATZ_MAXLEN,
                           'procure_zeichen', 'procure_coden', 'procure_x')
@@ -138,27 +159,39 @@ def main():
     # print('\n\n x:', x[234])
     # print('y: ', y[234])
 
-    print('\n', "aramark")
-    print(wortermodell.similar_by_vector('aramark', 5))
+    # print('\n', "aramark")
+    # print(wortermodell.similar_by_vector('aramark', 5))
     print("wholesale")
     print(wortermodell.similar_by_vector('wholesale', 5))
-    print("recruitment")
-    print(wortermodell.similar_by_vector('recruitment', 5))
+    # print("recruitment")
+    # print(wortermodell.similar_by_vector('recruitment', 5))
     # print("zurich")
     # print(wortermodell.similar_by_vector('zurich', 5))
 
+    print('  <<< prep data and stats time: ', elapsed(time.time() - start_time), '\n')
+
+
+    # -------------------------------------------
+
+    start_time = time.time()
+
     m_hidden = 256
-    epochs = 8
+    epochs = 7
     lamba_lrate = 0.001
-    batch_size = 64
+    batch_size = 128
 
     x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=False, random_state=13)
     vs.run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size)
 
-    
 
-    print('\n W2V Params: WordVec Len ', args.vek_grosse, ' | SentenceMax Len ', SATZ_MAXLEN, ' | ')
-    print('\n LSTM Params: Hiddens ', m_hidden, epochs, lamba_lrate, batch_size)
+    print('\n W2V: WVec Len \t| SentenceMax Len ')
+    print('\n               ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
+    print('\n LSTM: Hidden Size \t| Epochs   \t| Learn R   \t| batch_size')
+    print('\n                    ', m_hidden, '\t ', epochs, '\t ', lamba_lrate, '\t ', batch_size)
+
+    print("  <<< machine learning time: ", elapsed(time.time() - start_time), '\n')
+
+
     print('\n\n --- ERLEDIGT --- ')
 
 if __name__ == "__main__":
