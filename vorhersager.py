@@ -113,6 +113,9 @@ def train(sess, x_trn, y_trn, x, y, vorhersagt,
             # print(y_trn.shape)
             # print(batch_x.shape)
             # print(batch_y.shape)
+            # assert all(x.shape == (n_input, 1) for x in batch_x)
+            # assert all(y.shape == (k_output, 1) for y in batch_y)
+
             _, c = sess.run([optimizer, cost], feed_dict={x: batch_x, y: batch_y})
             # _, c = sess.run([optimizer, accuracy, cost, vorhersagt], feed_dict={x: batch_x, y: batch_y})
 
