@@ -49,7 +49,7 @@ def parse_args():
                         help='verzeichnis zu laden')
 
     parser.add_argument('-pt', '--protexts', nargs='+', type=str, dest='protexts',
-                        default=[['Procurement Name', 'GL Name']],
+                        default=[['Procurement taxonomy', 'Procurement Name', 'GL Name']],
                         		 # ['Vendor', 'Item Text']],
                         		 # ['AP Sub Category', 'Company Name', 'AP 3rd Level']],
                         		 # ['Procurement Name', 'GL Name']],
@@ -63,11 +63,11 @@ def parse_args():
                         help='procurement namen zu laden')
 
     parser.add_argument('-vg', '--vekgrosse', type=int, dest='vek_grosse',
-                        default=64,
+                        default=48,
                         help='Grosse des Vektors')
 
     parser.add_argument('-vf', '--vekfenster', type=int, dest='vek_fenster',
-                        default=6,
+                        default=3,
                         help='Fenster des Vektors')
 
     return parser.parse_args()
@@ -78,7 +78,7 @@ def main():
     args = parse_args()
 
 
-    SATZ_MAXLEN = 12
+    SATZ_MAXLEN = 10
     CLS_MIN = 1
     CLS_MAX = 536
 
@@ -177,9 +177,9 @@ def main():
 
     start_time = time.time()
 
-    m_hidden = 512
-    epochs = 7
-    lamba_lrate = 0.01
+    m_hidden = 256
+    epochs = 6
+    lamba_lrate = 0.008
     batch_size = 128
 
     x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=True, random_state=13)
