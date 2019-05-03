@@ -24,7 +24,6 @@ def zeichenen(daten_pd, vonfeld, anfeld):
                                       .replace(',', ' ').replace(':', ' ').replace('.', ' ')
                                       .replace('-', ' ').replace('|', ' ').replace('/', ' ')
                                       .replace('#', ' ').replace('&', ' ').replace('+', ' ')
-                                      .replace('«', ' ').replace('–', ' ')
                                       .replace(')', ' ').replace('(', ' ').lower()
                                       .split()), axis=1)
                                       # .replace('1', ' ').replace('2', ' ').replace('3', ' ')

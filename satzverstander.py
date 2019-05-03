@@ -93,10 +93,11 @@ def main():
 
         # print daten_pd['Procurement Name']
 
-        daten_pd['procure_str'] = daten_pd[args.protexts[i]].apply(lambda x: ' '.join(str(x)), axis=1)
+        daten_pd['procure_str'] = daten_pd[args.protexts[i]].apply(lambda x: ' '.join(x), axis=1)
         daten_pd['procure_cls'] = daten_pd[args.proclass[i]]
 
         daten_pd['File ID'] = i
+        print(daten_pd['procure_str'][:10])
         daten_pd = nl.zeichenen(daten_pd, 'procure_str', 'procure_zeichen')
         daten_pd['zeichen_len'] = daten_pd['procure_zeichen'].str.len()
 
