@@ -44,6 +44,8 @@ def parse_args():
                         default=['~/matching_model/data/cl3.csv'],
                                  # '~/matching_model/data/cl1_100k.csv'],
                                  # '~/matching_model/data/cl2f.csv'],
+                                 # '~/matching_model/data/cl1.csv'],
+                                 # '~/matching_model/data/cl2.csv'],
                                  # '~/matching_model/data/cl3.csv'],
                         help='verzeichnis zu laden')
 
@@ -66,7 +68,7 @@ def parse_args():
                         help='Grosse des Vektors')
 
     parser.add_argument('-vf', '--vekfenster', type=int, dest='vek_fenster',
-                        default=4,
+                        default=6,
                         help='Fenster des Vektors')
 
     return parser.parse_args()
@@ -74,6 +76,7 @@ def parse_args():
 def main():
 
     args = parse_args()
+
 
     SATZ_MAXLEN = 12
     CLS_MIN = 1
@@ -180,9 +183,9 @@ def main():
     vs.run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size)
 
     print('W2V: WVec Len \t| SentenceMax Len ')
-    print('               ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
-    print('\n LSTM: Hidden Size \t| Epochs   \t| Learn R   \t| batch_size')
-    print('                    ', m_hidden, '\t ', epochs, '\t ', lamba_lrate, '\t ', batch_size)
+    print('             ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
+    print('LSTM: Hidden Size \t| Epochs   \t| Learn R   \t| batch_size')
+    print('              ', m_hidden, '\t ', epochs, '\t ', lamba_lrate, '\t ', batch_size)
 
     print("   --- machine learning time: ", elapsed(time.time() - start_time))
     print(' --- total time: ', elapsed(time.time() - start_time_1))
