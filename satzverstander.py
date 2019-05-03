@@ -27,7 +27,6 @@ Die Unterlagen = the docs
 """
 
 
-
 def elapsed(sec):
     if sec<60:
         return str(sec) + " sec"
@@ -50,7 +49,7 @@ def parse_args():
                         help='verzeichnis zu laden')
 
     parser.add_argument('-pt', '--protexts', nargs='+', type=str, dest='protexts',
-                        default=[['Procurement taxonomy', 'Procurement Name', 'GL Name']],
+                        default=[['Procurement Name', 'GL Name']],
                         		 # ['Vendor', 'Item Text']],
                         		 # ['AP Sub Category', 'Company Name', 'AP 3rd Level']],
                         		 # ['Procurement Name', 'GL Name']],
@@ -72,6 +71,7 @@ def parse_args():
                         help='Fenster des Vektors')
 
     return parser.parse_args()
+
 
 def main():
 
@@ -107,6 +107,8 @@ def main():
     # -------------------------------------------
 
     start_time = time.time()
+
+    print(daten_pd['procure_zeichen'][:10])
     wortermodell = nl.bauen_wortermodell(daten_pd['procure_zeichen'], args.vek_grosse, args.vek_fenster)
     worter = list(wortermodell.wv.vocab)
     print('          analyzed ', len(worter), ' words')
