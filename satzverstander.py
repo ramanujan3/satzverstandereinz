@@ -41,7 +41,7 @@ def elapsed(sec):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-vz', '--vzchn', nargs='+', type=str, dest='vzchn',
-                        default=['~/matching_model/data/cl3MM.csv'],
+                        default=['~/matching_model/data/cl3.csv'],
                                  # '~/matching_model/data/cl1.csv'],
                                  # '~/matching_model/data/cl2.csv'],
                                  # '~/matching_model/data/cl3.csv'],
@@ -62,11 +62,11 @@ def parse_args():
                         help='procurement namen zu laden')
 
     parser.add_argument('-vg', '--vekgrosse', type=int, dest='vek_grosse',
-                        default=32,
+                        default=64,
                         help='Grosse des Vektors')
 
     parser.add_argument('-vf', '--vekfenster', type=int, dest='vek_fenster',
-                        default=4,
+                        default=6,
                         help='Fenster des Vektors')
 
     return parser.parse_args()
@@ -75,7 +75,7 @@ def main():
 
     args = parse_args()
 
-    SATZ_MAXLEN = 8
+    SATZ_MAXLEN = 10
     CLS_MIN = 1
     CLS_MAX = 536
 
@@ -94,7 +94,7 @@ def main():
         daten_pd['procure_cls'] =  daten_pd[args.proclass[i]]
 
         daten_pd['File ID'] = i
-        nl.zeichenen(daten_pd, 'procure_str', 'procure_zeichen')
+        daten_pd = nl.zeichenen(daten_pd, 'procure_str', 'procure_zeichen')
         daten_pd['zeichen_len'] = daten_pd['procure_zeichen'].str.len()
 
     # nl.zeichenen(daten_pd, 'Procurement Name', 'Procurement Zeichen')
@@ -109,8 +109,8 @@ def main():
     print('          analyzed ', len(worter), ' words')
 
     print('  --- build words model time: ', elapsed(time.time() - start_time), '\n')
-    # worter.sort()
-    # print(worter)
+    worter.sort()
+    print(worter[:169])
 
     # -------------------------------------------
 
@@ -178,14 +178,14 @@ def main():
     lamba_lrate = 0.001
     batch_size = 128
 
-    x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=False, random_state=13)
+    x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=True, random_state=13)
     vs.run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size)
 
 
     print('W2V: WVec Len \t| SentenceMax Len ')
-    print('               ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
-    print('\n LSTM: Hidden Size \t| Epochs   \t| Learn R   \t| batch_size')
-    print('                    ', m_hidden, '\t ', epochs, '\t ', lamba_lrate, '\t ', batch_size)
+    print('             ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
+    print('LSTM: Hidden Size \t| Epochs   \t| Learn R   \t| batch_size')
+    print('              ', m_hidden, '\t ', epochs, '\t ', lamba_lrate, '\t ', batch_size)
 
     print("   --- machine learning time: ", elapsed(time.time() - start_time))
     print(' --- total time: ', elapsed(time.time() - start_time_1))

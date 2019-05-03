@@ -36,10 +36,12 @@ def RNN(x, y, weights, biases, n_input, m_hidden, k_output):
     # x = tf.split(x, n_input)
 
     # 2-layer LSTM, each layer has m_hidden units.
+    rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(m_hidden),rnn.BasicLSTMCell(m_hidden)])
     # rnn_cell = ([tf.keras.layers.LSTMCell(m_hidden),tf.keras.layers.LSTMCell(m_hidden)])
+    # rnn_cell = rnn.BasicLSTMCell(rnn.BasicLSTMCell(m_hidden)])
 
     # 1-layer LSTM with n_hidden units but with lower accuracy.
-    rnn_cell = rnn.BasicLSTMCell(m_hidden)
+    # rnn_cell = rnn.BasicLSTMCell(m_hidden)
 
     # generate prediction
     outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
@@ -117,7 +119,7 @@ def train(sess, x_trn, y_trn, x, y, vorhersagt,
 
             i += batch_size
 
-        print('       --- epoch', epoch, '/', epochs, ', loss:', epoch_loss)
+        print('       - epoch', epoch, '/', epochs, ', loss:', epoch_loss)
 
     pred = tf.round(tf.nn.sigmoid(vorhersagt)).eval({x: np.array(x_trn), y: np.array(y_trn)})
 
@@ -207,6 +209,6 @@ def run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_si
             n_input, m_hidden, k_output, start_time) # x, y, weights, biases, n_input, k_output, x_trn, y_trn)
         test(sess, x_tst, y_tst, x, y, vorhersagt)
 
-    print('     --- total lstm time: ', elapsed(time.time() - start_time), '\n')
+    # print('     --- total lstm time: ', elapsed(time.time() - start_time), '\n')
 
     return
