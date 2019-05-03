@@ -40,18 +40,18 @@ def elapsed(sec):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-vz', '--vzchn', nargs='+', type=str, dest='vzchn',
-                        default=['~/matching_model/data/cl3.csv'],
+                        default=[# '~/matching_model/data/cl3.csv'],
                                  # '~/matching_model/data/cl1_100k.csv'],
-                                 # '~/matching_model/data/cl2f.csv'],
+                                 '~/matching_model/data/cl2f.csv'],
                                  # '~/matching_model/data/cl1.csv'],
                                  # '~/matching_model/data/cl2.csv'],
                                  # '~/matching_model/data/cl3.csv'],
                         help='verzeichnis zu laden')
 
     parser.add_argument('-pt', '--protexts', nargs='+', type=str, dest='protexts',
-                        default=[['Procurement Name', 'GL Name']],
+                        default=[# ['Procurement Name', 'GL Name']],
                         		 # ['Vendor', 'Item Text']],
-                        		 # ['AP Sub Category', 'Company Name', 'AP 3rd Level']],
+                        		 ['AP Sub Category', 'Company Name', 'AP 3rd Level']],
                         		 # ['Procurement Name', 'GL Name']],
                         help='procurement namen zu laden')
 
@@ -63,11 +63,11 @@ def parse_args():
                         help='procurement namen zu laden')
 
     parser.add_argument('-vg', '--vekgrosse', type=int, dest='vek_grosse',
-                        default=64,
+                        default=16,
                         help='Grosse des Vektors')
 
     parser.add_argument('-vf', '--vekfenster', type=int, dest='vek_fenster',
-                        default=6,
+                        default=5,
                         help='Fenster des Vektors')
 
     return parser.parse_args()
@@ -77,8 +77,7 @@ def main():
 
     args = parse_args()
 
-
-    SATZ_MAXLEN = 12
+    SATZ_MAXLEN = 8
     CLS_MIN = 1
     CLS_MAX = 536
 
@@ -93,7 +92,7 @@ def main():
 
         # print daten_pd['Procurement Name']
 
-        daten_pd['procure_str'] = daten_pd[args.protexts[i]].apply(lambda x: ' '.join(x), axis=1)
+        daten_pd['procure_str'] = daten_pd[args.protexts[i]].apply(lambda x: ' '.join(map(str, x)), axis=1)
         daten_pd['procure_cls'] = daten_pd[args.proclass[i]]
 
         daten_pd['File ID'] = i
@@ -123,7 +122,7 @@ def main():
     # No Matches can't be used for training and testing
     lbld_daten_pd = daten_pd[daten_pd.procure_cls != "No Match"]
 
-    nl.anhangen_wortcodes(lbld_daten_pd, wortermodell, args.vek_grosse, SATZ_MAXLEN,
+    nl.anhangen_wortcodes(lbld_daten_pd, worter, wortermodell, args.vek_grosse, SATZ_MAXLEN,
                           'procure_zeichen', 'procure_coden', 'procure_x')
 
     # print('\n', daten_pd.iloc[234])
@@ -178,9 +177,9 @@ def main():
     start_time = time.time()
 
     m_hidden = 512
-    epochs = 7
-    lamba_lrate = 0.01
-    batch_size = 128
+    epochs = 4
+    lamba_lrate = 0.002
+    batch_size = 256
 
     x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=True, random_state=13)
     vs.run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size)

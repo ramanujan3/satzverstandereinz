@@ -15,6 +15,9 @@ Bauen worter modell = build words model
 Anhangen wortcodes = Add word codes
 """
 
+MIN_WORD_LEN = 1
+MIN_WORD_FREQ = 2
+
 
 def zeichenen(daten_pd, vonfeld, anfeld):
 
@@ -25,20 +28,20 @@ def zeichenen(daten_pd, vonfeld, anfeld):
                                       .replace('-', ' ').replace('|', ' ').replace('/', ' ')
                                       .replace('#', ' ').replace('&', ' ').replace('+', ' ')
                                       .replace(')', ' ').replace('(', ' ').lower()
-                                      .split() if len(w) > 1]), axis=1)
-                                      # .replace('1', ' ').replace('2', ' ').replace('3', ' ')
-                                      # .replace('4', ' ').replace('5', ' ').replace('6', ' ')
-                                      # .replace('7', ' ').replace('8', ' ').replace('9', ' ').replace('0', ' ')
+                                      .replace('1', ' ').replace('2', ' ').replace('3', ' ')
+                                      .replace('4', ' ').replace('5', ' ').replace('6', ' ')
+                                      .replace('7', ' ').replace('8', ' ').replace('9', ' ').replace('0', ' ')
+                                      .split() if len(w) > MIN_WORD_LEN]), axis=1)
     # daten_pd[anfeld] = daten_pd[vonfeld].split(' ')
     return daten_pd
 
 
 def bauen_wortermodell(sentences, vec_size, vec_wind):
-    model = gensim.models.Word2Vec(sentences, size=vec_size, window=vec_wind, min_count=1)
+    model = gensim.models.Word2Vec(sentences, size=vec_size, window=vec_wind, min_count=MIN_WORD_FREQ)
     return model
 
 
-def anhangen_wortcodes(daten_pd, wortermodell, vekt_len, max_x, vonfeld, anfeld, anfeld2):
+def anhangen_wortcodes(daten_pd, worter, wortermodell, vekt_len, max_x, vonfeld, anfeld, anfeld2):
 
     wort_seq_list = daten_pd[vonfeld]
     wort_cseq_list = []
@@ -62,15 +65,18 @@ def anhangen_wortcodes(daten_pd, wortermodell, vekt_len, max_x, vonfeld, anfeld,
         # codes_avg = None
         for j, wort in enumerate(wort_seq):
 
-            wort_code = np.array(wortermodell[wort])
+            if (wort in worter):
+                wort_code = np.array(wortermodell[wort])
+            else:
+                print('Skipping word ', wort)
+                wort_code = [0] * vekt_len
             wort_cseq.append(wort_code)
-
             if (ob_fill):
                 if (j < max_x):
                     wort_cseq_x.extend(wort_code)
             else:
                 wort_cseq_x.extend(wort_code)
-                   
+
             # print i, j,' wort_code', wort, wort_code
 
             # if (codes_avg is None):
@@ -89,11 +95,9 @@ def anhangen_wortcodes(daten_pd, wortermodell, vekt_len, max_x, vonfeld, anfeld,
 
 def bauen_ausbildungen(daten_pd, wortermodell, vonfeld, neuefeld):
 
-
     wort_seq_list = daten_pd[vonfeld]
     wort_cseq_list = []
     # print 'wort_seq_list', wort_seq_list
-
 
     for i, wort_seq in enumerate(wort_seq_list):
 
@@ -103,6 +107,7 @@ def bauen_ausbildungen(daten_pd, wortermodell, vonfeld, neuefeld):
 
             wort_code = np.array(wortermodell[wort])
             wort_cseq.append(wort_code)
+
             # print i, j, 'wort_code', wort, wort_code
 
             # if (codes_avg is None):
