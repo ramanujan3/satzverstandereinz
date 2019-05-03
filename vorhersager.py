@@ -24,6 +24,7 @@ def elapsed(sec):
 logs_path = '/tmp/tensorflow/lstm_logs'
 writer = tf.summary.FileWriter(logs_path)
 
+
 def RNN(x, y, weights, biases, n_input, m_hidden, k_output):
 
     # reshape to [1, n_input]
@@ -37,9 +38,10 @@ def RNN(x, y, weights, biases, n_input, m_hidden, k_output):
 
     # 2-layer LSTM, each layer has m_hidden units.
     # rnn_cell = ([tf.keras.layers.LSTMCell(m_hidden),tf.keras.layers.LSTMCell(m_hidden)])
+    rnn_cell = rnn.MultiRNNCell([rnn.BasicLSTMCell(m_hidden), rnn.BasicLSTMCell(m_hidden)])
 
     # 1-layer LSTM with n_hidden units but with lower accuracy.
-    rnn_cell = rnn.BasicLSTMCell(m_hidden)
+    # rnn_cell = rnn.BasicLSTMCell(m_hidden)
 
     # generate prediction
     outputs, states = rnn.static_rnn(rnn_cell, x, dtype=tf.float32)
