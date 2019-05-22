@@ -15,7 +15,7 @@ Bauen worter modell = build words model
 Anhangen wortcodes = Add word codes
 """
 
-MIN_WORD_LEN = 1
+MIN_WORD_LEN = 2
 MIN_WORD_FREQ = 2
 
 
@@ -31,7 +31,7 @@ def zeichenen(daten_pd, vonfeld, anfeld):
                                       .replace('1', ' ').replace('2', ' ').replace('3', ' ')
                                       .replace('4', ' ').replace('5', ' ').replace('6', ' ')
                                       .replace('7', ' ').replace('8', ' ').replace('9', ' ').replace('0', ' ')
-                                      .split() if len(w) > MIN_WORD_LEN]), axis=1)
+                                      .split() if len(w) >= MIN_WORD_LEN]), axis=1)
     # daten_pd[anfeld] = daten_pd[vonfeld].split(' ')
     return daten_pd
 
@@ -47,6 +47,7 @@ def anhangen_wortcodes(daten_pd, worter, wortermodell, vekt_len, max_x, vonfeld,
     wort_cseq_list = []
     wort_cseq_x_list = []
     # print 'wort_seq_list', wort_seq_list
+    wort_skipped = []
 
     for i, wort_seq in enumerate(wort_seq_list):
 
@@ -68,7 +69,7 @@ def anhangen_wortcodes(daten_pd, worter, wortermodell, vekt_len, max_x, vonfeld,
             if (wort in worter):
                 wort_code = np.array(wortermodell[wort])
             else:
-                print('Skipping word ', wort)
+                wort_skipped.append(wort)
                 wort_code = [0] * vekt_len
             wort_cseq.append(wort_code)
             if (ob_fill):
@@ -87,7 +88,8 @@ def anhangen_wortcodes(daten_pd, worter, wortermodell, vekt_len, max_x, vonfeld,
 
         wort_cseq_list.append(wort_cseq)
         wort_cseq_x_list.append(wort_cseq_x)
-
+    
+    print('Words skipped ', wort_skipped)
     daten_pd[anfeld] = wort_cseq_list
     daten_pd[anfeld2] = wort_cseq_x_list
     return daten_pd

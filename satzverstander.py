@@ -36,22 +36,21 @@ def elapsed(sec):
         return str(sec/(60*60)) + " hr"
 
 
-
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-vz', '--vzchn', nargs='+', type=str, dest='vzchn',
-                        default=[# '~/matching_model/data/cl3.csv'],
+                        default=['~/matching_model/data/cl3.csv'],
                                  # '~/matching_model/data/cl1_100k.csv'],
-                                 '~/matching_model/data/cl2f.csv'],
+                                 # '~/matching_model/data/cl2f.csv'],
                                  # '~/matching_model/data/cl1.csv'],
                                  # '~/matching_model/data/cl2.csv'],
                                  # '~/matching_model/data/cl3.csv'],
                         help='verzeichnis zu laden')
 
     parser.add_argument('-pt', '--protexts', nargs='+', type=str, dest='protexts',
-                        default=[# ['Procurement Name', 'GL Name']],
+                        default=[['Procurement taxonomy', 'Procurement Name', 'GL Name']],
                         		 # ['Vendor', 'Item Text']],
-                        		 ['AP Sub Category', 'Company Name', 'AP 3rd Level']],
+                        		 # ['AP Sub Category', 'Company Name', 'AP 3rd Level']],
                         		 # ['Procurement Name', 'GL Name']],
                         help='procurement namen zu laden')
 
@@ -129,12 +128,12 @@ def main():
     # print('\n', daten_pd.iloc[2])
 
     print("\n Min/avg/max string lengths:", lbld_daten_pd['zeichen_len'].min(),
-                                         lbld_daten_pd['zeichen_len'].mean(),
-                                         lbld_daten_pd['zeichen_len'].max())
+                                            lbld_daten_pd['zeichen_len'].mean(),
+                                            lbld_daten_pd['zeichen_len'].max())
     lbld_daten_pd['procure_clsy'] = pd.to_numeric(lbld_daten_pd['procure_cls'])
     print(" Min/avg/max procurement class:", lbld_daten_pd['procure_clsy'].min(),
-                                         lbld_daten_pd['procure_clsy'].mean(),
-                                         lbld_daten_pd['procure_clsy'].max())
+                                             lbld_daten_pd['procure_clsy'].mean(),
+                                             lbld_daten_pd['procure_clsy'].max())
     print(' Num procure lines:',
           len(daten_pd))
     print(' Num labeled procure lines:',
@@ -170,6 +169,7 @@ def main():
     # print("zurich")
     # print(wortermodell.similar_by_vector('zurich', 5))
 
+    x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=True, random_state=13)
     print('\n', '  --- prep data and stats time: ', elapsed(time.time() - start_time), '\n')
 
     # -------------------------------------------
@@ -177,12 +177,11 @@ def main():
     start_time = time.time()
 
     m_hidden = 512
-    epochs = 4
+    epochs = 9
     lamba_lrate = 0.002
-    batch_size = 256
+    batch_size = 128
 
-    x_trn, x_tst, y_trn, y_tst = train_test_split(x, y, test_size=0.2, shuffle=True, random_state=13)
-    vs.run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size)
+    vs.run_lstm_KR(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size)
 
     print('W2V: WVec Len \t| SentenceMax Len ')
     print('             ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
