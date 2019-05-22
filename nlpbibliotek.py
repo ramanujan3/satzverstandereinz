@@ -27,11 +27,11 @@ def zeichenen(daten_pd, vonfeld, anfeld):
                                       .replace(',', ' ').replace(':', ' ').replace('.', ' ')
                                       .replace('-', ' ').replace('|', ' ').replace('/', ' ')
                                       .replace('#', ' ').replace('&', ' ').replace('+', ' ')
-                                      .replace(')', ' ').replace('(', ' ').lower()
+                                      .replace(')', ' ').replace('(', ' ').replace("*", " ")
                                       .replace('1', ' ').replace('2', ' ').replace('3', ' ')
                                       .replace('4', ' ').replace('5', ' ').replace('6', ' ')
                                       .replace('7', ' ').replace('8', ' ').replace('9', ' ').replace('0', ' ')
-                                      .split() if len(w) >= MIN_WORD_LEN]), axis=1)
+                                      .lower().split() if len(w) > MIN_WORD_LEN]), axis=1)
     # daten_pd[anfeld] = daten_pd[vonfeld].split(' ')
     return daten_pd
 
@@ -88,7 +88,7 @@ def anhangen_wortcodes(daten_pd, worter, wortermodell, vekt_len, max_x, vonfeld,
 
         wort_cseq_list.append(wort_cseq)
         wort_cseq_x_list.append(wort_cseq_x)
-    
+
     print('Words skipped ', wort_skipped)
     daten_pd[anfeld] = wort_cseq_list
     daten_pd[anfeld2] = wort_cseq_x_list
@@ -120,5 +120,5 @@ def bauen_ausbildungen(daten_pd, wortermodell, vonfeld, neuefeld):
 
         wort_cseq_list.append(wort_cseq)
 
-    daten_pd[anfeld] = wort_cseq_list
+    daten_pd[neuefeld] = wort_cseq_list
     return daten_pd
