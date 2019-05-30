@@ -39,7 +39,7 @@ def elapsed(sec):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-vz', '--vzchn', nargs='+', type=str, dest='vzchn',
-                        default=['~/matching_model/data/cl3.csv',
+                        default=['~/matching_model/data/cl3MM.csv',
                                  # '~/matching_model/data/cl1_100k.csv'],
                                  '~/matching_model/data/cl2f.csv'],
                                  # '~/matching_model/data/cl1.csv'],
@@ -137,7 +137,7 @@ def main():
     # No Matches can't be used for training and testing
     # lbld_daten_pd = daten_pd[daten_pd.procure_cls != "No Match"]
     # But let's try making them zeros
-    lbld_daten_pd = daten_pd # .copy()
+    lbld_daten_pd = daten_pd  # .copy()
     # lbld_daten_pd[lbld_daten_pd['procure_cls'] is "No Match"]['procure_cls'] = '0'
 
     lbld_daten_pd['procure_cls'].replace("No Match", "0", inplace=True)
@@ -235,17 +235,21 @@ def main():
     y_pred, y_conf = vs.run_lstm_KR(x_trn, x_tst, x_fnl, y_trn, y_tst, y_fnl,
                                     m_hidden, epochs, lamba_lrate, batch_size)
 
+    lbld_daten_final = lbld_daten_pd[lbld_daten_pd['tsf'] == 'F']
     print("Saving data")
 
     # for clsyz, tsf in zip(lbld_daten_pd['procure_clsy'], lbld_daten_pd['tsf']):
     #     find
 
-    lbld_daten_pd['Pred_Implan536Index'] = y_pred
-    lbld_daten_pd['Pred_Conf'] = y_conf
+    print(len(y_pred))
+    print(len(y_conf))
+    print(lbld_daten_final.shape)
+    lbld_daten_final['Pred_Implan536Index'] = y_pred
+    lbld_daten_final['Pred_Conf'] = y_conf
     # daten_fl['Pred_Implan536Index'] = y_pred
     # daten_fl['Pred_Implan536Index'] = y_pred
 
-    lbld_daten_pd.to_csv(final_name + '_pred.csv')
+    lbld_daten_final.to_csv(final_name + '_pred.csv')
 
     print('W2V: WVec Len \t| SentenceMax Len ')
     print('             ', args.vek_grosse, ' \t |', SATZ_MAXLEN)
