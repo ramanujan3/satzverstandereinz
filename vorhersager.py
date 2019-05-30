@@ -81,6 +81,25 @@ def test_KR(model, x_tst, y_tst):
     print('Test set\n  Loss: {:0.3f}\n  Accuracy: {:0.3f}'.format(accr[0], accr[1]))
     return model
 
+
+def final_KR(model, x_fnl, y_fnl):
+    # test_sequences = tok.texts_to_sequences(x_tst)
+    # test_sequences_matrix = sequence.pad_sequences(test_sequences,maxlen=max_len)
+    y_out = model.predict(x_fnl)
+
+    y_pred = np.argmax(y_out, axis=1)
+    print(y_pred)
+    y_conf = np.amax(y_out, axis=1)
+    print(y_conf)
+    # y_pred = [max(y) for y in y_out]
+    # print(y_pred[0])
+    # print(y_pred[0].shape)
+    # print(max(y_pred[0]))
+    # y_predc = model.predict_classes(x_fnl)
+    # print(y_predc[:10])
+    return model, y_pred, y_conf
+
+
 ## ---------------------
 
 
@@ -216,10 +235,10 @@ def test(sess, x_tst, y_tst, x, y, vorhersagt):
     return accuracy_sc
 
 
-def run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size):
+def run_lstm(x_trn, x_tst, x_fnl, y_trn, y_tst, y_fnl, m_hidden, epochs, lamba_lrate, batch_size):
     start_time = time.time()
 
-     # number of units in RNN cell
+    # number of units in RNN cell
     n_input = len(x_trn[0])
     k_output = len(y_trn[0])
 
@@ -227,8 +246,8 @@ def run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_si
     print('     --- lstm build time: ', elapsed(time.time() - start_time), '\n')
 
     # Initializing the variables
-    #init = tf.global_variables_initializer()
-    #init = tf.local_variables_initializer()
+    # init = tf.global_variables_initializer()
+    # init = tf.local_variables_initializer()
 
     # Launch the graph
     with tf.Session() as sess:
@@ -246,7 +265,7 @@ def run_lstm(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_si
     return train_acc, test_acc
 
 
-def run_lstm_KR(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch_size):
+def run_lstm_KR(x_trn, x_tst, x_fnl, y_trn, y_tst, y_fnl, m_hidden, epochs, lamba_lrate, batch_size):
     start_time = time.time()
 
     # number of units in RNN cell
@@ -255,7 +274,11 @@ def run_lstm_KR(x_trn, x_tst, y_trn, y_tst, m_hidden, epochs, lamba_lrate, batch
 
     model = build_KR(lamba_lrate, n_input, m_hidden, k_output)
     model = train_KR(model, x_trn, y_trn, batch_size, epochs)
-    model = test_KR(model, x_tst, y_tst)
+
+    print(x_tst.shape)
+    if (x_tst.shape[0] > 0):
+        model = test_KR(model, x_tst, y_tst)
+    _, y_pred, y_conf = final_KR(model, x_fnl, y_fnl)
 
     print('     --- total KR lstm time: ', elapsed(time.time() - start_time), '\n')
-    return
+    return y_pred, y_conf
